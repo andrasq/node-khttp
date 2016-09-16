@@ -1,0 +1,19 @@
+{
+  "name": "k-http",
+  "version": "1.0.0",
+  "description": "kinvey http",
+  "main": "khttp.js",
+  "engines": {
+    "node": "> 0.10"
+  },
+  "license": "Kinvey",
+  "repository": "git+ssh://github.com/andrasq/node-k-http",
+  "dependencies": {
+  },
+  "devDependencies": {
+  },
+  "scripts": {
+    "test": "mocha --version && mocha -b test-khttp.js || echo 'mocha not installed; try \"npm install -g mocha\"'",
+    "coverage": "nyc --version && nyc --include khttp.js mocha test-khttp.js || echo 'nyc not installed; try \"npm install -g nyc\"'"
+  }
+}
