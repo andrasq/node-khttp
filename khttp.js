@@ -160,3 +160,7 @@ function try_json_encode( obj ) {
     try { return JSON.stringify(obj) }
     catch (err) { return '' + obj }
 }
+
+// speed access to res.body
+http.IncomingMessage.prototype.body = http.IncomingMessage.prototype.body || null;
+http.IncomingMessage.prototype = http.IncomingMessage.prototype;
