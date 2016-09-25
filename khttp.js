@@ -90,7 +90,7 @@ function krequest(callerOptions, requestBody, callback) {
         var chunks = new Array();
 
         res.on('error', function(err) {
-            // can this event ever happen?  invalid http and tcp errors both to to req.on 'error'
+            // can this event ever happen?  invalid http and tcp errors both go to req.on 'error'
             returnOnce(err, req, res);
         })
 
@@ -142,8 +142,23 @@ function krequest(callerOptions, requestBody, callback) {
     return req;
 }
 
+
 module.exports = {
     request: krequest,
+
+    defaults: function defaults(options) {
+        return {
+            opts: mergeOptions({}, options),
+            request: function(url, body, cb) {
+                var opts = {};
+                mergeOptions(opts, this.opts);
+                mergeOptions(opts, url);
+                // use module.exports for testability
+                return module.exports.request(opts, body, cb);
+            },
+            defaults: defaults,
+        }
+    },
 
     // for testing
     allowDuplicateCallbacks: false,
@@ -159,6 +174,19 @@ function try_json_decode( str ) {
 function try_json_encode( obj ) {
     try { return JSON.stringify(obj) }
     catch (err) { return '' + obj }
+}
+
+function mergeOptions( to, from ) {
+    var k;
+    if (typeof from === 'string') to.url = from;
+    else {
+        for (k in from) if (k !== 'headers') to[k] = from[k];
+        if (from.headers) {
+            to.headers = to.headers || {};
+            for (k in from.headers) to.headers[k] = from.headers[k];
+        }
+    }
+    return to;
 }
 
 // speed access to res.body

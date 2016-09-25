@@ -60,6 +60,14 @@ http options used to construct a url from parts:
 
 Other options are presumed to be http options and are passed to the request.
 
+### khttp.defaults( urlOrOptions )
+
+Construct a pre-configured caller with a method `request` that will use
+khttp.request to make calls.
+
+The options are as in khttp.request.  Call-time options provided to
+`callre.request` override the default options.
+
 
 Related Work
 ------------
@@ -72,5 +80,6 @@ Related Work
 Chane Log
 ---------
 
+- 1.1.0 - `defaults()` function to return a pre-configured caller
 - 1.0.1 - speed access to res.body, readme edits
 - 1.0.0 - initial checkin

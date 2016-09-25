@@ -88,6 +88,7 @@ describe ('khttp', function() {
 
     afterEach(function(done) {
         khttp.allowDuplicateCallbacks = false;
+        khttp.request = httpRequest;
         httpRequest.allowDuplicateCallbacks = false;
         done();
     })
@@ -363,6 +364,45 @@ httpRequest.allowDuplicateCallbacks = true;
             req.emit('error', new Error("deliberate response error"));
             if (calledCount > 1) return done(new Error("too many callbacks"));
             setTimeout(function(){ done() }, 50);
+        })
+    })
+
+    describe ('defaults', function() {
+        it ('should construct a caller', function(done) {
+            var caller = khttp.defaults({ url: "http://example.com", headers: { uniq: uniq } });
+            assert.equal(caller.opts.url, "http://example.com");
+            assert.deepEqual(caller.opts.headers, { uniq: uniq });
+            assert.equal(typeof caller.request, 'function');
+            done();
+        })
+
+        it ('should use khttp.request to make request', function(done) {
+            var caller = khttp.defaults({ json: true, headers: { 'Content-Length': -1 } });
+            var called = false;
+            khttp.request = function(url, body, cb) { called = true; httpRequest(url, body, cb) };
+            caller.request("http://localhost:1337", function(err, res, body) {
+                assert.ifError(err);
+                assert.equal(called, true);
+                assert.equal(typeof body, 'object');
+                assert.equal(body.headers['content-length'], 0);
+                done();
+            })
+        })
+
+        it ('should pass headers to request', function(done) {
+            var caller = khttp.defaults({ url: "http://localhost:1337" });
+            caller.request({ json: true, headers: { 'x-tracer': uniq } }, function(err, res, body) {
+                assert.equal(body.headers['x-tracer'], uniq);
+                done();
+            })
+        })
+
+        it ('should override options', function(done) {
+            var caller = khttp.defaults({ json: true, encoding: 'utf8' });
+            caller.request({ json: false, encoding: null }, function(err, res, body) {
+                assert.ok(Buffer.isBuffer(body));
+                done();
+            })
         })
     })
 
