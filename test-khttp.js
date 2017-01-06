@@ -21,7 +21,6 @@ var https = require('https');
 var khttp = require('.');
 
 var httpRequest = khttp.request;
-//httpRequest = require('./ar/httpRequest.js');
 
 var echoService = 'http://localhost:1337';
 var pingService = echoService + '/ping';
@@ -89,7 +88,6 @@ describe ('khttp', function() {
     afterEach(function(done) {
         khttp.allowDuplicateCallbacks = false;
         khttp.request = httpRequest;
-        httpRequest.allowDuplicateCallbacks = false;
         done();
     })
 
@@ -112,7 +110,7 @@ describe ('khttp', function() {
 
     it ('should make a request to a url string', function(done) {
         httpRequest(echoService, function(err, res, body) {
-            assert.ifError();
+            assert.ifError(err);
             assert.equal(JSON.parse(body).url, '/');
             assert.equal(JSON.parse(body).method, 'GET');
             done();
@@ -141,7 +139,7 @@ describe ('khttp', function() {
 
     it ('should accept url as a function parameter', function(done) {
         httpRequest({ url: echoService, body: 'some test body' }, uniq, function(err, res, body) {
-            assert.ifError();
+            assert.ifError(err);
             assert.equal(JSON.parse(body).body, uniq);
             done();
         })

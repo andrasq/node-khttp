@@ -1,10 +1,10 @@
 {
   "name": "k-http",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "kinvey http",
   "main": "khttp.js",
   "engines": {
-    "node": "> 0.10"
+    "node": ">= 0.10"
   },
   "license": "Kinvey",
   "repository": "git+ssh://github.com/andrasq/node-k-http",
