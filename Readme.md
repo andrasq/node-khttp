@@ -80,6 +80,7 @@ Related Work
 Chane Log
 ---------
 
+- 1.2.0 - harden socket timeout handling
 - 1.1.0 - `defaults()` function to return a pre-configured caller
 - 1.0.1 - speed access to res.body, readme edits
 - 1.0.0 - initial checkin

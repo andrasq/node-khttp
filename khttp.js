@@ -23,8 +23,9 @@ var Url = require('url');
  * http caller, makes calls like http and returns responses kinda like request
  */
 function krequest(callerOptions, requestBody, callback) {
-    var connectTimer = null;
     var onSocketTimeout = null;
+    var socketTimer = null;
+    var req;
 
     if (!callback) { callback = requestBody; requestBody = undefined }
 
@@ -70,7 +71,7 @@ function krequest(callerOptions, requestBody, callback) {
 
     var isDone = false;
     function returnOnce(err, req, res, body) {
-        clearTimeout(connectTimer);
+        clearTimeout(socketTimer);
         if (onSocketTimeout) {
             req.removeListener('timeout', onSocketTimeout);
             req.socket.removeListener('timeout', onSocketTimeout);
@@ -81,10 +82,32 @@ function krequest(callerOptions, requestBody, callback) {
         }
     }
 
+    if (options.timeout > 0) {
+        var connected = false;
+        onSocketTimeout = function onSocketTimeout( ) {
+            if (!connected) {
+                req.abort();
+                var err = new Error("connect timeout");
+                err.code = 'ETIMEDOUT';
+            } else {
+                req.socket.destroy();
+                var err = new Error("data timeout");
+                err.code = 'ESOCKETTIMEDOUT';
+            }
+            returnOnce(err, req);
+        }
+        socketTimer = setTimeout(onSocketTimeout, options.timeout | 0);
+    }
+
     var protocolEngine = (options.protocol === 'https:') ? https : http;
-    var req = protocolEngine.request(options, function(res) {
-        clearTimeout(connectTimer);
+    req = protocolEngine.request(options, function(res) {
+        connected = true;
         var chunks = new Array();
+
+        if (options.timeout > 0) {
+            clearTimeout(socketTimer);
+            socketTimer = setTimeout(onSocketTimeout, options.timeout | 0);
+        }
 
         res.on('error', function(err) {
             // can this event ever happen?  invalid http and tcp errors both go to req.on 'error'
@@ -93,6 +116,10 @@ function krequest(callerOptions, requestBody, callback) {
 
         res.on('data', function(chunk) {
             chunks.push(chunk);
+            if (options.timeout > 0) {
+                clearTimeout(socketTimer);
+                socketTimer = setTimeout(onSocketTimeout, options.timeout | 0);
+            }
         })
 
         res.on('end', function() {
@@ -113,28 +140,6 @@ function krequest(callerOptions, requestBody, callback) {
     })
 
     req.end(requestBody);
-
-    if (options.timeout > 0) {
-        var timeout = parseInt(options.timeout);
-
-        // use a timer to time out even a connect blocked on a dns lookup
-        connectTimer = setTimeout(function() {
-            req.abort();
-            var err = new Error("connect timeout");
-            err.code = 'ETIMEDOUT';
-            returnOnce(err, req);
-        }, timeout);
-
-        // setTimeout before the socket is connected to make nock work
-        // the timeout handler is called from req.socket, ie socket exists
-        onSocketTimeout = function() {
-            var err = new Error("data timeout");
-            err.code = 'ESOCKETTIMEDOUT';
-            req.socket.destroy();
-            returnOnce(err, req);
-        }
-        req.setTimeout(timeout, onSocketTimeout);
-    }
 
     return req;
 }
