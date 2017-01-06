@@ -30,11 +30,8 @@ function krequest(callerOptions, requestBody, callback) {
 
     if (typeof callerOptions === 'string') callerOptions = { url: callerOptions };
 
-    var k;
-    var options = {};
-    for (k in callerOptions) options[k] = callerOptions[k];
-    options.headers = {};
-    for (k in callerOptions.headers) if (callerOptions.headers[k] != null) options.headers[k] = callerOptions.headers[k];
+    var options = copyFields({}, callerOptions);
+    options.headers = copyFields({}, callerOptions.headers);
 
     // parse url kinda like request
     if (options.url) {
@@ -176,15 +173,22 @@ function try_json_encode( obj ) {
     catch (err) { return '' + obj }
 }
 
+function copyFields( to, from ) {
+    for (var k in from) {
+        to[k] = from[k];
+    }
+    return to;
+}
+
 function mergeOptions( to, from ) {
     var k;
     if (typeof from === 'string') to.url = from;
     else {
-        for (k in from) if (k !== 'headers') to[k] = from[k];
-        if (from.headers) {
-            to.headers = to.headers || {};
-            for (k in from.headers) if (from.headers[k] != null) to.headers[k] = from.headers[k];
-        }
+        var tosHeaders = to.headers;
+        copyFields(to, from);
+        to.headers = from.headers ? copyFields(tosHeaders || {}, from.headers) : tosHeaders;
+        // avoid null/undefined headers, node http would error out
+        for (var k in to.headers) if (to.headers[k] == null) delete to.headers[k];
     }
     return to;
 }
