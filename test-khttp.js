@@ -216,7 +216,6 @@ describe ('khttp', function() {
 
     it ('should return response error', function(done) {
         khttp.allowDuplicateCallbacks = true;
-httpRequest.allowDuplicateCallbacks = true;
         httpRequest({ url: echoService }, function(err, res, body) {
             if (!err) res.emit('error', new Error('deliberate res error'));
             if (err) {
@@ -234,6 +233,30 @@ httpRequest.allowDuplicateCallbacks = true;
             assert.equal(body.headers.connection, 'keep-alive');
             done();
         })
+    })
+
+    it ('should reuse keepAlive connection without too many listeners error', function(done) {
+        var agent = new http.Agent({ keepAlive: true });
+        var callCount = 0;
+        var t1 = Date.now();
+        var cpu1 = process.cpuUsage();
+        (function testLoop() {
+            httpRequest({ url: echoService, agent: agent }, function(err, res, body) {
+                callCount += 1;
+                if (err) return done(err);
+                if (callCount < 200) {
+                    setImmediate(testLoop);
+                }
+                else {
+                    var cpu = process.cpuUsage(cpu1);
+                    var t2 = Date.now();
+                    console.log("%s: %d http calls in %d ms, total cpu %d ms (%d bytes)",
+                        httpRequest.name, callCount, t2-t1, cpu.user/1000 + cpu.system/1000, body.length);
+                    // note: 58ms elapsed < 80ms cpu due to i/o threads; run on a single core to get elapsed >= cpu used
+                    return done();
+                }
+            })
+        })();
     })
 
     it ('should accept string body', function(done) {
