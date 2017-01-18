@@ -34,7 +34,7 @@ function krequest(callerOptions, requestBody, callback) {
     var options = {};
     for (k in callerOptions) options[k] = callerOptions[k];
     options.headers = {};
-    for (k in callerOptions.headers) options.headers[k] = callerOptions.headers[k];
+    for (k in callerOptions.headers) if (callerOptions.headers[k] != null) options.headers[k] = callerOptions.headers[k];
 
     // parse url kinda like request
     if (options.url) {
@@ -183,7 +183,7 @@ function mergeOptions( to, from ) {
         for (k in from) if (k !== 'headers') to[k] = from[k];
         if (from.headers) {
             to.headers = to.headers || {};
-            for (k in from.headers) to.headers[k] = from.headers[k];
+            for (k in from.headers) if (from.headers[k] != null) to.headers[k] = from.headers[k];
         }
     }
     return to;

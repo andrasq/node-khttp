@@ -397,6 +397,15 @@ httpRequest.allowDuplicateCallbacks = true;
             })
         })
 
+        it ('should not set null headers', function(done) {
+            var caller = khttp.defaults({ url: "http://localhost:1337" });
+            caller.request({ json: true, headers: { 'x-tracer': uniq, 'x-empty': null } }, function(err, res, body) {
+                assert.equal(body.headers['x-tracer'], uniq);
+                assert(body.headers['x-empty'] === undefined);
+                done();
+            })
+        })
+
         it ('should override options', function(done) {
             var caller = khttp.defaults({ json: true, encoding: 'utf8' });
             caller.request({ json: false, encoding: null }, function(err, res, body) {
