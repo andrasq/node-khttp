@@ -29,10 +29,8 @@ function krequest(callerOptions, requestBody, callback) {
 
     if (!callback) { callback = requestBody; requestBody = undefined }
 
-    if (typeof callerOptions === 'string') callerOptions = { url: callerOptions };
-
-    var options = copyFields({}, callerOptions);
-    options.headers = copyFields({}, callerOptions.headers);
+    var options = { headers: {} };
+    mergeOptions(options, callerOptions);
 
     // parse url kinda like request
     if (options.url) {
@@ -174,23 +172,31 @@ function try_json_encode( obj ) {
     catch (err) { return '' + obj }
 }
 
-function copyFields( to, from ) {
+// merge http request options, handling headers properly
+function mergeOptions( to, from ) {
+    // special case convert url strings to url options
+    if (typeof from === 'string') {
+        to.url = from;
+        return;
+    }
+
+    // merge in new request options, but not any headers yet
+    var existingHeaders = to.headers;
     for (var k in from) {
         to[k] = from[k];
     }
-    return to;
-}
+    to.headers = existingHeaders;
 
-function mergeOptions( to, from ) {
-    var k;
-    if (typeof from === 'string') to.url = from;
-    else {
-        var tosHeaders = to.headers;
-        copyFields(to, from);
-        to.headers = from.headers ? copyFields(tosHeaders || {}, from.headers) : tosHeaders;
-        // avoid null/undefined headers, node http would error out
-        for (var k in to.headers) if (to.headers[k] == null) delete to.headers[k];
+    // then merge in headers from a valid headers object
+    if (from.headers && typeof from.headers === 'object') {
+        if (!to.headers) to.headers = {};
+        for (var k in from.headers) {
+            // clear header if null/undefined; node http disallows undefined headers
+            if (from.headers[k] != undefined) to.headers[k] = from.headers[k];
+            else delete to.headers[k];
+        }
     }
+
     return to;
 }
 
