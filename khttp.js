@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2016, Kinvey, Inc. All rights reserved.
+ * Copyright (c) 2016-2017, Kinvey, Inc. All rights reserved.
  *
  * This software is licensed to you under the Kinvey terms of service located at
  * http://www.kinvey.com/terms-of-use. By downloading, accessing and/or using this
@@ -72,10 +72,6 @@ function krequest(callerOptions, requestBody, callback) {
     var isDone = false;
     function returnOnce(err, req, res, body) {
         clearTimeout(socketTimer);
-        if (onSocketTimeout) {
-            req.removeListener('timeout', onSocketTimeout);
-            req.socket.removeListener('timeout', onSocketTimeout);
-        }
         if (!isDone || module.exports.allowDuplicateCallbacks) {
             isDone = true;
             callback(err, res, body);
@@ -96,17 +92,17 @@ function krequest(callerOptions, requestBody, callback) {
             }
             returnOnce(err, req);
         }
-        socketTimer = setTimeout(onSocketTimeout, options.timeout | 0);
+        socketTimer = setTimeout(onSocketTimeout, options.timeout);
     }
 
     var protocolEngine = (options.protocol === 'https:') ? https : http;
     req = protocolEngine.request(options, function(res) {
-        connected = true;
         var chunks = new Array();
 
         if (options.timeout > 0) {
+            connected = true;
             clearTimeout(socketTimer);
-            socketTimer = setTimeout(onSocketTimeout, options.timeout | 0);
+            socketTimer = setTimeout(onSocketTimeout, options.timeout);
         }
 
         res.on('error', function(err) {
@@ -118,7 +114,7 @@ function krequest(callerOptions, requestBody, callback) {
             chunks.push(chunk);
             if (options.timeout > 0) {
                 clearTimeout(socketTimer);
-                socketTimer = setTimeout(onSocketTimeout, options.timeout | 0);
+                socketTimer = setTimeout(onSocketTimeout, options.timeout);
             }
         })
 
