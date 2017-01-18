@@ -67,6 +67,7 @@ function krequest(callerOptions, requestBody, callback) {
     else requestBody = '' + requestBody;
     options.headers['Content-Length'] = (typeof requestBody === 'string') ? Buffer.byteLength(requestBody) : requestBody.length;
 
+
     var isDone = false;
     function returnOnce(err, req, res, body) {
         clearTimeout(socketTimer);
@@ -76,6 +77,8 @@ function krequest(callerOptions, requestBody, callback) {
         }
     }
 
+    // arrange to error out on connect or data timeouts
+    // avoid req.setTimeout, socket timeouts leak memory in node v6.8.0 - v6.9.4
     if (options.timeout > 0) {
         var connected = false;
         onSocketTimeout = function onSocketTimeout( ) {
@@ -90,6 +93,7 @@ function krequest(callerOptions, requestBody, callback) {
             }
             returnOnce(err, req);
         }
+        // time out the connection in case of eg a slow dns lookup
         socketTimer = setTimeout(onSocketTimeout, options.timeout);
     }
 
@@ -97,19 +101,21 @@ function krequest(callerOptions, requestBody, callback) {
     req = protocolEngine.request(options, function(res) {
         var chunks = new Array();
 
+        // connection made, switch to data timeout
         if (options.timeout > 0) {
             connected = true;
             clearTimeout(socketTimer);
             socketTimer = setTimeout(onSocketTimeout, options.timeout);
         }
 
+        // not sure res errors can ever happen, but just in case
         res.on('error', function(err) {
-            // can this event ever happen?  invalid http and tcp errors both go to req.on 'error'
             returnOnce(err, req, res);
         })
 
         res.on('data', function(chunk) {
             chunks.push(chunk);
+            // reset data timeout on every chunk
             if (options.timeout > 0) {
                 clearTimeout(socketTimer);
                 socketTimer = setTimeout(onSocketTimeout, options.timeout);
@@ -129,10 +135,12 @@ function krequest(callerOptions, requestBody, callback) {
         })
     })
 
+    // listen for http and tcp errors
     req.once('error', function(err) {
         returnOnce(err, req);
     })
 
+    // send the http request
     req.end(requestBody);
 
     return req;
