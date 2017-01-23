@@ -199,8 +199,8 @@ function mergeOptions( to, from ) {
     if (from.headers && typeof from.headers === 'object') {
         if (!to.headers) to.headers = {};
         for (var k in from.headers) {
-            // clear header if null/undefined; node http disallows undefined headers
-            if (from.headers[k] != undefined) to.headers[k] = from.headers[k];
+            // clear header if undefined, node http disallows undefined headers
+            if (from.headers[k] !== undefined) to.headers[k] = from.headers[k];
             else delete to.headers[k];
         }
     }

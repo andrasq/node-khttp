@@ -418,11 +418,11 @@ describe ('khttp', function() {
             })
         })
 
-        it ('should not set null headers', function(done) {
+        it ('should omit undefined headers', function(done) {
             var caller = khttp.defaults({ url: "http://localhost:1337" });
-            caller.request({ json: true, headers: { 'x-tracer': uniq, 'x-empty': null } }, function(err, res, body) {
+            caller.request({ json: true, headers: { 'x-tracer': uniq, 'x-empty': undefined } }, function(err, res, body) {
                 assert.equal(body.headers['x-tracer'], uniq);
-                assert(body.headers['x-empty'] === undefined);
+                assert(!('x-empty' in body.headers));
                 done();
             })
         })
