@@ -151,7 +151,7 @@ module.exports = {
     request: krequest,
 
     defaults: function defaults(options) {
-        return {
+        var caller = {
             opts: mergeOptions({}, options),
             request: function(url, body, cb) {
                 var opts = {};
@@ -161,12 +161,37 @@ module.exports = {
                 return module.exports.request(opts, body, cb);
             },
             defaults: defaults,
-        }
+        };
+        return addAliases(caller);
     },
 
     // for testing
     allowDuplicateCallbacks: false,
 };
+addAliases(module.exports);
+
+// decorate the khttp caller with handy aliases
+function addAliases( caller ) {
+    caller.call = function call(method, url, body, cb) {
+        return caller.request(mergeOptions({method: method}, url), body, cb);
+    };
+    // make available the aliases `request` does, for familiarity
+    caller.get = function get(url, body, cb) { return caller.call('GET', url, body, cb) };
+    caller.head = function del(url, body, cb) { return caller.call('HEAD', url, body, cb) };
+    caller.post = function post(url, body, cb) { return caller.call('POST', url, body, cb) };
+    caller.put = function put(url, body, cb) { return caller.call('PUT', url, body, cb) };
+    caller.patch = function patch(url, body, cb) { return caller.call('PATCH', url, body, cb) };
+    caller.del = function del(url, body, cb) { return caller.call('DELETE', url, body, cb) };
+
+    return optimizeAccess(caller);
+}
+
+// optimize access to the object properties
+function optimizeAccess( object ) {
+    function F() {};
+    return F.prototype = object;
+    try { } finally { }
+}
 
 // decode json into object, or return the string if not valid json
 function try_json_decode( str ) {

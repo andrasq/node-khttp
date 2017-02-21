@@ -443,6 +443,42 @@ describe ('khttp', function() {
         })
     })
 
+    describe ('shortcuts', function() {
+        it ('should make a get request', function(done) {
+            khttp.get("http://localhost:1337", "body", function(err, res, body) {
+                assert.ifError(err);
+                assert.equal(JSON.parse(body).method, 'GET');
+                done();
+            })
+        })
+
+        it ('should make a post request', function(done) {
+            khttp.post("http://localhost:1337", "body", function(err, res, body) {
+                assert.ifError(err);
+                assert.equal(JSON.parse(body).method, 'POST');
+                done();
+            })
+        })
+
+        it ('should make a del request', function(done) {
+            khttp.del("http://localhost:1337", "body", function(err, res, body) {
+                assert.ifError(err);
+                assert.equal(JSON.parse(body).method, 'DELETE');
+                done();
+            })
+        })
+
+        it ('defaults should have a get method', function(done) {
+            var defaults = khttp.defaults({ url: "http://localhost:1337" });
+            defaults.get("/path/to/resource", "body", function(err, res, body) {
+                assert.ifError(err);
+                assert.equal(JSON.parse(body).method, 'GET');
+                assert.equal(JSON.parse(body).url, '/path/to/resource');
+                done();
+            })
+        })
+    })
+
     describe ('performance', function() {
         it ('should use little cpu', function(done) {
             var caller = httpRequest;
