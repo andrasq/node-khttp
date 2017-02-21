@@ -410,6 +410,13 @@ describe ('khttp', function() {
             })
         })
 
+        it ('should save options', function(done) {
+            var a = {a:1, b:2};
+            var b = khttp.defaults(a);
+            assert.deepEqual(b.opts, a);
+            done();
+        })
+
         it ('should pass headers to request', function(done) {
             var caller = khttp.defaults({ url: "http://localhost:1337" });
             caller.request({ json: true, headers: { 'x-tracer': uniq } }, function(err, res, body) {
@@ -444,7 +451,8 @@ describe ('khttp', function() {
             var cpu = process.cpuUsage();
             var t1 = Date.now();
             var uri = {
-                url: "https://google.com/login",        // 1.5k
+                url: "https://google.com/login",        // 1.5k, 30ms
+                url: "http://bing.com/",                // 256b, 21ms
             }
             for (var callCount=0; callCount<10; callCount++) {
                 caller(uri, callDone);
@@ -454,7 +462,8 @@ describe ('khttp', function() {
                 if (doneCount === callCount) {
                     var t2 = Date.now();
                     cpu = process.cpuUsage(cpu);
-                    console.log("%s: %d calls in %d ms, total cpu %d ms (%d bytes)", caller.name, callCount, t2-t1, cpu.user/1000 + cpu.system/1000, body.length);
+                    console.log("%s: %d https calls in %d ms, total cpu %d ms (%d bytes)",
+                        caller.name, callCount, t2-t1, cpu.user/1000 + cpu.system/1000, body.length);
                     // timed on a cpu with cpufreq/scaling_governor set to "performance":
                     // https small:    khttp: 20ms for 10, request: 32ms for 10 (1.5k)
                     done();

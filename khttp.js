@@ -183,17 +183,18 @@ function try_json_encode( obj ) {
 // merge http request options, handling headers properly
 function mergeOptions( to, from ) {
     // special case convert url strings to url options
-    if (typeof from === 'string') {
-        to.url = from;
-        return;
-    }
+    if (typeof from === 'string') from = { url: from };
 
     // merge in new request options, but not any headers yet
     var existingHeaders = to.headers;
     for (var k in from) {
-        to[k] = from[k];
+        // the url is special, handle baseUrl-relative paths
+        if (k === 'url' && typeof from.url === 'string' && from.url[0] === '/' && to.url != null) {
+            to.url += from.url;
+        }
+        else to[k] = from[k];
     }
-    to.headers = existingHeaders;
+    if (existingHeaders != null) to.headers = existingHeaders;
 
     // then merge in headers from a valid headers object
     if (from.headers && typeof from.headers === 'object') {
