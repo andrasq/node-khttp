@@ -15,6 +15,11 @@ Example
         // ...
     })
 
+    var sendBody = { m: 5678 }
+    khttp.post("http://example.com", sendBody, function(err, res, responseBody) {
+        // ...
+    })
+
 
 Api
 ---
@@ -48,6 +53,8 @@ k-http options (kinda like `request`):
   If the response is not valid json, returns the response string.
 - `auth` - object with fields `{ username: , password: }` used to build an
   "Authorization: Basic" header.  The fields `{ user: , pass: }` are also accepted.
+- `raw` - do not wait for and decode body, return immediately and let the caller
+  wait for `res.on('data')` events.
 
 http options used to construct a url from parts:
 - `protocol` - 'http:' or 'https:' (default 'http:')
@@ -67,6 +74,15 @@ khttp.request to make calls.
 
 The options are as in khttp.request.  Call-time options provided to
 `callre.request` override the default options.
+
+### khttp.call( method, urlOrOptions, [body,] callback(err, res, body) )
+
+Call `request` with the specified method.
+
+### khttp.get( urlOrOptions, [body,] callback(err, res, body) )
+
+The `call` method is also accessible as the conveinence methods `get`, `post`,
+`put`, `head`, `del`, and `patch`, which invoke `call` with the appropriate method.
 
 
 Related Work

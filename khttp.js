@@ -80,6 +80,7 @@ function krequest(callerOptions, requestBody, callback) {
     // arrange to error out on connect or data timeouts
     // avoid req.setTimeout, socket timeouts leak memory in node v6.8.0 - v6.9.4
     if (options.timeout > 0) {
+        var rawRes = null;
         var connected = false;
         onSocketTimeout = function onSocketTimeout( ) {
             if (!connected) {
@@ -92,6 +93,7 @@ function krequest(callerOptions, requestBody, callback) {
                 err.code = 'ESOCKETTIMEDOUT';
             }
             returnOnce(err, req);
+            if (rawRes) rawRes.emit('error', err);
         }
         // time out the connection in case of eg a slow dns lookup
         socketTimer = setTimeout(onSocketTimeout, options.timeout);
@@ -106,6 +108,12 @@ function krequest(callerOptions, requestBody, callback) {
             connected = true;
             clearTimeout(socketTimer);
             socketTimer = setTimeout(onSocketTimeout, options.timeout);
+        }
+
+        if (options.raw) {
+            // arrange for the raw result to still be notified of timeout errors
+            rawRes = res;
+            returnOnce(null, req, res);
         }
 
         // not sure res errors can ever happen, but just in case
@@ -155,7 +163,7 @@ module.exports = {
             opts: mergeOptions({}, options),
             request: function(url, body, cb) {
                 var opts = {};
-                mergeOptions(opts, this.opts);
+                mergeOptions(opts, caller.opts);
                 mergeOptions(opts, url);
                 // use module.exports for testability
                 return module.exports.request(opts, body, cb);

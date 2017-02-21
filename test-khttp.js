@@ -388,6 +388,34 @@ describe ('khttp', function() {
         })
     })
 
+    describe ('options', function() {
+        it ('options.raw should not wait for body', function(done) {
+            var httpRequest = khttp.defaults({ raw: true }).request;
+            httpRequest(echoService, function(err, res) {
+                assert.ifError(err);
+                var chunks = [];
+                res.on('data', function(chunk) {
+                    chunks.push(chunk);
+                })
+                res.on('end', function() {
+                    assert(chunks.length > 0);
+                    done();
+                })
+            })
+        })
+
+        it ('options.raw should time out', function(done) {
+            var httpRequest = khttp.defaults({ raw: true }).request;
+            httpRequest({ url: echoService + '/slowcall', timeout: slowCallMs / 5 }, function(err, res, body) {
+                assert(!err);
+                res.on('error', function(err) {
+                    assert.equal(err.code, 'ESOCKETTIMEDOUT');
+                    done();
+                })
+            })
+        })
+    })
+
     describe ('defaults', function() {
         it ('should construct a caller', function(done) {
             var caller = khttp.defaults({ url: "http://example.com", headers: { uniq: uniq } });
