@@ -196,9 +196,10 @@ function addAliases( caller ) {
 
 // optimize access to the object properties
 function optimizeAccess( object ) {
-    function F() {};
+    var F = function() {};
+    try { } finally { }         // disable optimization of this function
+    F();                        // for code coverage
     return F.prototype = object;
-    try { } finally { }
 }
 
 // decode json into object, or return the string if not valid json
@@ -225,13 +226,14 @@ function mergeOptions( to, from ) {
         if (k === 'url' && typeof from.url === 'string' && from.url[0] === '/' && to.url != null) {
             to.url += from.url;
         }
+        else if (k === 'headers') ;     // handle below
         else to[k] = from[k];
     }
     if (existingHeaders != null) to.headers = existingHeaders;
 
     // then merge in headers from a valid headers object
     if (from.headers && typeof from.headers === 'object') {
-        if (!to.headers) to.headers = {};
+        if (!to.headers || typeof to.headers !== 'object') to.headers = {};
         for (var k in from.headers) {
             // clear header if undefined, node http disallows undefined headers
             if (from.headers[k] !== undefined) to.headers[k] = from.headers[k];

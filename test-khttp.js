@@ -469,6 +469,13 @@ describe ('khttp', function() {
                 done();
             })
         })
+
+        it ('should merge in options headers', function(done) {
+            var caller = khttp.defaults({ headers: {'header-1': 'value-1'} });
+            assert.ok(caller.opts);
+            assert.equal(caller.opts.headers['header-1'], 'value-1');
+            done();
+        })
     })
 
     describe ('shortcuts', function() {
@@ -504,6 +511,20 @@ describe ('khttp', function() {
                 assert.equal(JSON.parse(body).url, '/path/to/resource');
                 done();
             })
+        })
+
+        it ('shortcuts should invoke .call', function(done) {
+            var caller = khttp.defaults({});
+            var methods = { get: 'GET', head: 'HEAD', post: 'POST', put: 'PUT', patch: 'PATCH', del: 'DELETE' };
+            var lastMethodCalled = null;
+            caller.call = function(method, url, body, cb) {
+                lastMethodCalled = method;
+            }
+            for (var method in methods) {
+                caller[method]("url", "body", function cb(){});
+                assert.equal(lastMethodCalled, methods[method]);
+            }
+            done();
         })
     })
 
