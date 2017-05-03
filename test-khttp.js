@@ -18,13 +18,30 @@
 var assert = require('assert');
 var http = require('http');
 var https = require('https');
-var khttp = require('.');
+var khttp = require('./');
 
 var httpRequest = khttp.request;
 
 var echoService = 'http://localhost:1337';
 var pingService = echoService + '/ping';
 var slowCallMs = 100;
+
+// quick cpuUsage() for eg node-v0.10
+if (!process.cpuUsage) {
+    var os = require('os');
+    process.cpuUsage = function( usage ) {
+        var cpus = os.cpus();
+        // os.cpu uses 100us units, cpuUsage uses 1us
+        var user = 0, system = 0;
+        for (var i=0; i<cpus.length; i++) {
+            user +=  cpus[i].times.user * 100;
+            system += cpus[i].times.sys * 100;
+        }
+        return (usage)
+            ? { user: user - usage.user, system: system - usage.system }
+            : { user: user, system: system };
+    }
+}
 
 describe ('khttp', function() {
     var echoServer;
@@ -118,7 +135,7 @@ describe ('khttp', function() {
     })
 
     it ('should make a request to the url with query and body', function(done) {
-        httpRequest({ url: pingService, body: uniq, query: 'a=1&b=2' }, function(err, res, body) {
+        httpRequest({ url: pingService, body: uniq, query: 'a=1&b=2', headers: {Connection: 'close'} }, function(err, res, body) {
             assert(body.indexOf('PONG:') === 0);
             body = JSON.parse(body.slice(5));
             assert.equal(body.url, '/ping?a=1&b=2');
