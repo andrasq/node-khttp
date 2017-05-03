@@ -465,7 +465,7 @@ describe ('khttp', function() {
         it ('should override options', function(done) {
             var caller = khttp.defaults({ json: true, encoding: 'utf8' });
             caller.request({ json: false, encoding: null }, function(err, res, body) {
-                assert.ok(Buffer.isBuffer(body));
+                assert.ok(Buffer.isBuffer(body), "expected Buffer, got: " + (body));
                 done();
             })
         })
