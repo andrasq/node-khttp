@@ -465,6 +465,7 @@ describe ('khttp', function() {
         it ('should override options', function(done) {
             var caller = khttp.defaults({ json: true, encoding: 'utf8' });
             caller.request({ json: false, encoding: null }, function(err, res, body) {
+                assert.ifError(err)
                 assert.ok(Buffer.isBuffer(body), "expected Buffer, got: " + (body));
                 done();
             })
@@ -536,7 +537,7 @@ describe ('khttp', function() {
             var cpu = process.cpuUsage();
             var t1 = Date.now();
             var uri = {
-                url: "https://google.com/login",        // 1.5k, 30ms
+                //url: "https://google.com/login",        // 1.5k, 30ms
                 url: "http://bing.com/",                // 256b, 21ms
             }
             for (var callCount=0; callCount<10; callCount++) {
