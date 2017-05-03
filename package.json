@@ -13,7 +13,7 @@
   "devDependencies": {
   },
   "scripts": {
-    "test": "mocha --version && mocha -b test-khttp.js || echo 'mocha not installed; try \"npm install -g mocha\"'",
+    "test": "mocha --version && mocha -b test-khttp.js",
     "coverage": "nyc --version && nyc --include khttp.js --reporter lcov --reporter text mocha test-khttp.js || echo 'nyc not installed; try \"npm install -g nyc\"'",
     "clean": "rm -rf .nyc_output coverage",
     "coveralls": "nyc --reporter text --reporter text-lcov npm run test | coveralls"
