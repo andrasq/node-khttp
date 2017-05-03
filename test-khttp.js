@@ -463,7 +463,7 @@ describe ('khttp', function() {
         })
 
         it ('should override options', function(done) {
-            var caller = khttp.defaults({ json: true, encoding: 'utf8' });
+            var caller = khttp.defaults({ url: "http://localhost:1337", json: true, encoding: 'utf8' });
             caller.request({ json: false, encoding: null }, function(err, res, body) {
                 assert.ifError(err)
                 assert.ok(Buffer.isBuffer(body), "expected Buffer, got: " + (body));
