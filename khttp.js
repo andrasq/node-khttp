@@ -195,11 +195,10 @@ function addAliases( caller ) {
 }
 
 // optimize access to the object properties
+// approach borrowed from qhash:  make the object a prototoype, and leave it
+// attached to the function so the side effect cannot be dead-code eliminated
 function optimizeAccess( object ) {
-    var F = function() {};
-    try { } finally { }         // disable optimization of this function
-    F();                        // for code coverage
-    return F.prototype = object;
+    return optimizeAccess.prototype = object;
 }
 
 // decode json into object, or return the string if not valid json
