@@ -494,6 +494,14 @@ describe ('khttp', function() {
             assert.equal(caller.opts.headers['header-1'], 'value-1');
             done();
         })
+
+        it ('should inherit from parent', function(done) {
+            var caller1 = khttp.defaults({ url: "http://localhost:1337", headers: {'header-1': 'value-1'} });
+            var caller2 = caller1.defaults({ headers: {'header-2': 'value-2'} });
+            assert.equal(caller2.opts.url, "http://localhost:1337");
+            assert.deepEqual(caller2.opts.headers, { 'header-1': 'value-1', 'header-2': 'value-2' });
+            done();
+        })
     })
 
     describe ('shortcuts', function() {

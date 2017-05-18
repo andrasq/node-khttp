@@ -159,8 +159,9 @@ module.exports = {
     request: krequest,
 
     defaults: function defaults(options) {
+        var myOptions = (this && this.opts) ? mergeOptions({}, this.opts) : {};
         var caller = {
-            opts: mergeOptions({}, options),
+            opts: mergeOptions(myOptions, options),
             request: function(url, body, cb) {
                 var opts = {};
                 mergeOptions(opts, caller.opts);
