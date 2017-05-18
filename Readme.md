@@ -99,6 +99,7 @@ Related Work
 Chane Log
 ---------
 
+- 1.3.4 - fix headers edge case, simplify optimizeAccess, coverage buttons
 - 1.3.1 - fix headers merging to always copy, 100% code coverage
 - 1.3.0 - fix options merging, add `get`/`put`/`post` etc aliases
 - 1.2.0 - harden socket timeout handling
