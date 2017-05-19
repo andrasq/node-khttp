@@ -100,6 +100,7 @@ Related Work
 Chane Log
 ---------
 
+- 1.3.6 - fix: fix url + path combo, fix: send empty request body if `null` or `undefined`
 - 1.3.5 - make defaults() inherit settings from parent
 - 1.3.4 - fix headers edge case, simplify optimizeAccess, coverage buttons
 - 1.3.1 - fix headers merging to always copy, 100% code coverage

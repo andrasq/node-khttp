@@ -154,6 +154,31 @@ describe ('khttp', function() {
         })
     })
 
+    it ('should combine base url with path', function(done) {
+        var caller = khttp.defaults({ url: 'http://localhost:1337' })
+        caller.get({ query: 'a=123', path: '/default' }, function(err, res, body) {
+            body = JSON.parse(body)
+            assert.equal(body.url, '/default?a=123');
+            done();
+        })
+    })
+
+    it ('should combine partial url with path', function(done) {
+        var caller = khttp.defaults({ url: 'http://localhost:1337/partial' })
+        caller.get({ query: 'a=123', path: '/path' }, function(err, res, body) {
+            body = JSON.parse(body)
+            assert.equal(body.url, '/partial/path?a=123');
+            done();
+        })
+    })
+
+    it ('should send empty body if null', function(done) {
+        httpRequest(echoService, null, function(err, res, body) {
+            assert.strictEqual(JSON.parse(body).body, "");
+            done();
+        })
+    })
+
     it ('should accept url as a function parameter', function(done) {
         httpRequest({ url: echoService, body: 'some test body' }, uniq, function(err, res, body) {
             assert.ifError(err);

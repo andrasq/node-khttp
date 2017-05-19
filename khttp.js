@@ -39,7 +39,7 @@ function krequest(callerOptions, requestBody, callback) {
         options.protocol = parsedUrl.protocol;
         options.hostname = parsedUrl.hostname;
         options.port = parsedUrl.port;
-        options.path = parsedUrl.path;
+        options.path = parsedUrl.path + (options.path ? (parsedUrl.path === '/' && options.path[0] === '/' ? options.path.slice(1) : options.path) : '');
     }
 
     // http.request wants the query string appended to the path
@@ -64,6 +64,11 @@ function krequest(callerOptions, requestBody, callback) {
         requestBody = try_json_encode(requestBody);
         if (!options.headers['Content-Type'] && !options.headers['content-type']) options.headers['Content-Type'] = 'application/json'
     }
+    else if (requestBody == null) {
+        // null or undefined means no request body
+        requestBody = '';
+    }
+    // else coerce to string
     else requestBody = '' + requestBody;
     options.headers['Content-Length'] = (typeof requestBody === 'string') ? Buffer.byteLength(requestBody) : requestBody.length;
 
