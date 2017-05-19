@@ -38,9 +38,10 @@ Arguments:
 - `body` - request body to send, optional.  Can be a string, Buffer or object.
   Strings and Buffers are sent as-is, all other types (objects, numbers, etc)
   are json stringified before being sent.
-- `callback` - function to receive the response.  The callback is passed any
-  error, the response object, and the decoded response body.  For better compatibility
-  with existing code, the response is annotated with `res.body` = `body`.
+- `callback` - function to receive the response.  The callback is passed any error
+  `err`, the response object `res`, and the response body `body`.  The response is
+  annotated with `res.body` = `body`.  The returned `body` can be a string, a Buffer,
+  or an object, depending on `options.encoding` and `options.json`.
 
 k-http options (kinda like `request`):
 - `url` - remote host to connect to, specified as a string in the form

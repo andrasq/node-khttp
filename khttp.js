@@ -137,6 +137,7 @@ function krequest(callerOptions, requestBody, callback) {
             responseBody = options.json ? try_json_decode(responseBody)
                 : (options.encoding !== null) ? responseBody.toString(options.encoding)
                 : responseBody;
+            // request (and restify.JsonClient) sets res.body to the returned responseBody
             res.body = responseBody;
 
             returnOnce(null, req, res, res.body);
