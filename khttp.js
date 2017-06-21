@@ -22,7 +22,7 @@ var Url = require('url');
 /**
  * http caller, makes calls like http and returns responses kinda like request
  */
-function krequest(callerOptions, requestBody, callback) {
+function krequest( callerOptions, requestBody, callback ) {
     var onSocketTimeout = null;
     var socketTimer = null;
     var req;

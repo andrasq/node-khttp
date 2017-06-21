@@ -27,13 +27,13 @@ Example
 Api
 ---
 
-### khttp.request( urlOrOptions, [body,] callback(err, res, body) )
+### khttp.request( optionsOrUrl, [body,] callback(err, res, body) )
 
 Make a web request to the url string or target specified by the options.
 The options are passed directly to `http.request` or `https.request`.
 
 Arguments:
-- `urlOrOptions` - remote service specification, either as a url string
+- `optionsOrUrl` - remote service specification, either as a url string
   or an http options object.  String urls use `GET`.
 - `body` - request body to send, optional.  Can be a string, Buffer or object.
   Strings and Buffers are sent as-is, all other types (objects, numbers, etc)
@@ -71,7 +71,7 @@ http options used to construct a url from parts:
 
 Other options are presumed to be http options and are passed to the request.
 
-### khttp.defaults( urlOrOptions )
+### khttp.defaults( optionsOrUrl )
 
 Construct a pre-configured caller with a method `request` that will use
 khttp.request to make calls.
@@ -79,11 +79,11 @@ khttp.request to make calls.
 The options are as in khttp.request.  Call-time options provided to
 `callre.request` override the default options.
 
-### khttp.call( method, urlOrOptions, [body,] callback(err, res, body) )
+### khttp.call( method, optionsOrUrl, [body,] callback(err, res, body) )
 
 Call `request` with the specified method.
 
-### khttp.get( urlOrOptions, [body,] callback(err, res, body) )
+### khttp.get( optionsOrUrl, [body,] callback(err, res, body) )
 
 The `call` method is also accessible as the conveinence methods `get`, `post`,
 `put`, `head`, `del`, and `patch`, which invoke `call` with the appropriate method.
