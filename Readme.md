@@ -101,6 +101,7 @@ Related Work
 Change Log
 ----------
 
+- 1.3.8 - fix tests to work with node-0.8
 - 1.3.7 - cloned as `khttp`
 - 1.3.6 - fix: fix url + path combo, fix: send empty request body if `null` or `undefined`
 - 1.3.5 - make defaults() inherit settings from parent

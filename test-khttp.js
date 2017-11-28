@@ -26,6 +26,8 @@ var echoService = 'http://localhost:1337';
 var pingService = echoService + '/ping';
 var slowCallMs = 100;
 
+if (typeof setImmediate === 'undefined') var setImmediate = process.nextTick;
+
 // quick cpuUsage() for eg node-v0.10
 if (!process.cpuUsage) {
     var os = require('os');
