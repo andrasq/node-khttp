@@ -1,13 +1,15 @@
 {
-  "name": "k-http",
-  "version": "1.3.6",
-  "description": "kinvey http",
+  "name": "khttp",
+  "version": "1.3.7",
+  "description": "fast easy Kinvey http",
   "main": "khttp.js",
   "engines": {
     "node": ">= 0.10"
   },
   "license": "Kinvey",
-  "repository": "git+ssh://github.com/andrasq/node-k-http",
+  "private": true,
+  "repository": "git+ssh://github.com/andrasq/node-khttp",
+  "keywords": [ "Kinvey", "http", "fast", "easy", "simple" ],
   "dependencies": {
   },
   "devDependencies": {

@@ -1,17 +1,17 @@
-k-http
-======
+khttp
+=====
 
-[![Build Status](https://api.travis-ci.org/andrasq/node-k-http.svg?branch=master)](https://travis-ci.org/andrasq/node-k-http?branch=master)
-[![Coverage Status](https://codecov.io/github/andrasq/node-k-http/coverage.svg?branch=master)](https://codecov.io/github/andrasq/node-k-http?branch=master)
+[![Build Status](https://api.travis-ci.org/andrasq/node-khttp.svg?branch=master)](https://travis-ci.org/andrasq/node-khttp?branch=master)
+[![Coverage Status](https://codecov.io/github/andrasq/node-khttp/coverage.svg?branch=master)](https://codecov.io/github/andrasq/node-khttp?branch=master)
 
-Thin, light-weight convenience wrapper around http and https.
-Makes web requests kinda like `qhttp`, returns responses kinda like `request`.
+Fast, light-weight convenience wrapper around `http` and `https`.
+Makes web requests kinda like `request` but without the overhead.
 
 
 Example
 -------
 
-    var khttp = require('k-http');
+    var khttp = require('khttp');
 
     var requestBody = { n: 1234 }
     khttp.request("http://example.com", requestBody, function(err, res, responseBody) {
@@ -43,7 +43,7 @@ Arguments:
   annotated with `res.body` = `body`.  The returned `body` can be a string, a Buffer,
   or an object, depending on `options.encoding` and `options.json`.
 
-k-http options (kinda like `request`):
+khttp options (kinda like `request`):
 - `url` - remote host to connect to, specified as a string in the form
   protocol://host/path?query
 - `body` - request body to send, as described above (default empty string "").
@@ -84,6 +84,7 @@ The options are as in khttp.request.  Call-time options provided to
 Call `request` with the specified method.
 
 ### khttp.get( optionsOrUrl, [body,] callback(err, res, body) )
+### post, put, head, del, patch
 
 The `call` method is also accessible as the conveinence methods `get`, `post`,
 `put`, `head`, `del`, and `patch`, which invoke `call` with the appropriate method.
@@ -97,9 +98,10 @@ Related Work
 - [restify jsonClient](http://npmjs.org/package/restify)
 
 
-Chane Log
----------
+Change Log
+----------
 
+- 1.3.7 - cloned as `khttp`
 - 1.3.6 - fix: fix url + path combo, fix: send empty request body if `null` or `undefined`
 - 1.3.5 - make defaults() inherit settings from parent
 - 1.3.4 - fix headers edge case, simplify optimizeAccess, coverage buttons
